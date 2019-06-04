@@ -6,7 +6,8 @@
 package push
 
 import (
-	"fmt"
+    "encoding/json"
+    "fmt"
 	"time"
 )
 
@@ -45,6 +46,42 @@ type AndroidNotification struct {
 	//通过该Intent打开对应app组件，所以pkg_content字符串格式必须遵循Intent uri格式，最简单的方法可以通过Intent方法toURI()获取
 	PkgContent    string                 `json:"pkg_content"`
 	CustomContent map[string]interface{} `json:"custom_content"` //自定义内容，键值对，Json对象形式(可选)；在android客户端，这些键值对将以Intent中的extra进行传递。
+}
+
+//{
+//    "aps": {
+//         "alert":"Message From Baidu Cloud Push-Service",
+//         "sound":"",  //可选
+//          "badge":0,    //可选
+//    },
+//    "key1":"value1",
+//    "key2":"value2"
+//}
+//alert：其内容可以为字符串或者字典，如果是字符串，那么将会在通知中显示这条内容。
+//badge：其值为数字，表示当通知到达设备时，应用的角标变为多少。如果没有使用这个字段，那么应用的角标将不会改变。设置为 0 时，会清除应用的角标。
+//sound：指定通知展现时伴随的提醒音文件名。如果找不到指定的文件或者值为 default，那么默认的系统音将会被使用。如果为空，那么将没有声音。
+//"key1" "value1" "key2" "value2": 用户自定义参数的字段的key值和对应的vlue值。
+type IOSNotification struct {
+    Alert string
+    Sound string
+    Badge int64
+    M  map[string]interface{}
+}
+
+func (n *IOSNotification) JSON()(string ,error){
+    var apsm = map[string]interface{}{}
+    
+    apsm["alert"] = n.Alert
+    apsm["sound"] = n.Sound
+    apsm["badge"] = n.Badge
+    n.M["aps"] = apsm
+    
+    b,err :=json.Marshal(n.M)
+    if err !=nil {
+        return "",err
+    }
+    
+    return string(b),nil
 }
 
 // 推送消息到单台设备
