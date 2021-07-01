@@ -65,6 +65,7 @@ type IOSNotification struct {
     Alert string
     Sound string
     Badge int64
+    ContentAvailable int
     M  map[string]interface{}
 }
 
@@ -74,6 +75,7 @@ func (n *IOSNotification) JSON()(string ,error){
     apsm["alert"] = n.Alert
     apsm["sound"] = n.Sound
     apsm["badge"] = n.Badge
+    apsm["content-available"] =n.ContentAvailable
     n.M["aps"] = apsm
     
     b,err :=json.Marshal(n.M)
